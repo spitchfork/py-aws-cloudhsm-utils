@@ -1,0 +1,24 @@
+{
+  "Clusters": [
+    {
+      "BackupPolicy": "DEFAULT",
+      "BackupRetentionPolicy": {
+        "Type": "DAYS",
+        "Value": "90"
+      },
+      "Certificates": {},
+      "ClusterId": "cluster-z3...",
+      "CreateTimestamp": 1.234567890E9,
+      "HsmType": "hsm1.medium",
+      "Hsms": [],
+      "SecurityGroup": "sg-07...",
+      "State": "CREATE_IN_PROGRESS",
+      "SubnetMapping": {
+        "eu-west-2a": "subnet-09...",
+        "eu-west-2b": "subnet-0a..."
+      },
+      "TagList": [],
+      "VpcId": "vpc-00..."
+    }
+  ]
+}

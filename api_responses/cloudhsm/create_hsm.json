@@ -1,0 +1,9 @@
+{
+  "Hsm": {
+    "AvailabilityZone": "eu-west-2a",
+    "ClusterId": "cluster-jsh...",
+    "HsmId": "hsm-bgk...",
+    "State": "CREATE_IN_PROGRESS",
+    "SubnetId": "subnet-0a3..."
+  }
+}
