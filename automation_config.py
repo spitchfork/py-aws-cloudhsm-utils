@@ -7,7 +7,10 @@ config_parser.read('config.ini')
 config = config_parser["DEFAULT"]
 validation_utils.validate_config(config)
 
+# SSM params
 vpc_id_ssm_param_name = config["HsmVpcIdSsmParamName"]
+hsm_cluster_id_param_name = config["HsmClusterIdSsmParamName"]
+
 hsm_type = config["HsmType"]
 hsm_client_sg_tag_name = config["HsmClientSGTagName"]
 hsm_client_sg_tag_value = config["HsmClientSGTagValue"]

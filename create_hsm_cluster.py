@@ -18,6 +18,8 @@ def provision_cluster():
     try:
         # create cloudhsm cluster
         cluster_details = create_hsm_cluster()
+        # store the hsm cluster id in SSM for future reference
+        ssm_services.create_hsm_cluster_id_param(cluster_details["hsm_cluster_id"])
 
     except exceptions.SsmParameterNotFoundError as err:
         logger.error(err)
