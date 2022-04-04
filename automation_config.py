@@ -19,3 +19,9 @@ hsm_sub_enabled_tag_value = config["HsmSubnetEnabledTagValue"]
 hsm_from_port = config.getint("HsmFromPort")
 hsm_to_port = config.getint("HsmToPort")
 
+ca_country = config["CACountry"]
+ca_org = config["CAOrg"]
+ca_common_name = config["CACommonName"]
+ca_key_exponent = config.getint("CAKeyExponent")
+ca_key_size = config.getint("CAKeySize")
+ca_cert_expiry_days = config.getint("CACertExpiryDays")
