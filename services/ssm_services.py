@@ -10,6 +10,10 @@ import exceptions
 logger = logging.getLogger(__name__)
 
 
+def get_hsm_cluster_id():
+    return get_parameter(config.hsm_cluster_id_param_name)
+
+
 def get_hsm_vpc_id():
     return get_parameter(config.vpc_id_ssm_param_name)
 
@@ -42,5 +46,5 @@ def create_hsm_cluster_id_param(hsm_cluster_id):
 def put_parameter(name, value, ssm_type):
     ssm_client = boto3.client('ssm')
     logger.debug("Calling ssm.put_parameter with name={} and value={}".format(name, value))
-    ssm_client.put_parameter(Name=name, Value=value, Type=ssm_type)
+    ssm_client.put_parameter(Name=name, Value=value, Type=ssm_type, Overwrite=True)
     logger.debug("SSM parameter created successfully.")
