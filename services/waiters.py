@@ -63,3 +63,13 @@ class HsmClusterCreateCompleteWaiter(BaseWaiter):
 
     def wait(self):
         self._wait()
+
+
+class HsmCreateCompleteWaiter(BaseWaiter):
+    def __init__(self, client):
+        # TODO need to change this to support other HSM creations after the initial setup!
+        super().__init__('HsmCreateComplete', 'DescribeClusters', 'Clusters[0].Hsms[0].State',
+                         {'ACTIVE': WaitState.SUCCESS}, client)
+
+    def wait(self):
+        self._wait()

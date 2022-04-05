@@ -10,6 +10,8 @@ validation_utils.validate_config(config)
 # SSM params
 vpc_id_ssm_param_name = config["HsmVpcIdSsmParamName"]
 hsm_cluster_id_param_name = config["HsmClusterIdSsmParamName"]
+hsm_ca_cert_param_name = config["HsmCACertSsmParamName"]
+hsm_cluster_cert_param_name = config["HsmClusterCertSsmParamName"]
 
 hsm_type = config["HsmType"]
 hsm_client_sg_tag_name = config["HsmClientSGTagName"]
@@ -25,3 +27,4 @@ ca_common_name = config["CACommonName"]
 ca_key_exponent = config.getint("CAKeyExponent")
 ca_key_size = config.getint("CAKeySize")
 ca_cert_expiry_days = config.getint("CACertExpiryDays")
+hsm_cert_expiry_days = config.getint("HsmCertExpiryDays")

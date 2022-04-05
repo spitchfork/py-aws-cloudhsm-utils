@@ -48,6 +48,13 @@ def wait_for_cluster_create_complete():
     return
 
 
+def wait_for_hsm_create_complete():
+    hsm_client = boto3.client('cloudhsmv2')
+    hsm_waiter = waiters.HsmCreateCompleteWaiter(hsm_client)
+    hsm_waiter.wait()
+    return
+
+
 def get_hsm_clusters_by_vpc_id(vpc_id):
     vpc_id_filter = {"vpcIds": [vpc_id]}
     return get_hsm_clusters(vpc_id_filter)
@@ -59,3 +66,22 @@ def get_hsm_clusters(boto_filter):
 
     logger.debug("get_hsm_clusters() returning: {}".format(hsm_clusters))
     return hsm_clusters
+
+
+def get_hsm_csr_pem(hsm_cluster_id):
+    cluster_id_filter = {"clusterIds": [hsm_cluster_id]}
+
+    hsm_clusters = get_hsm_clusters(cluster_id_filter)
+    hsm_csr_str = hsm_clusters["Clusters"][0]["Certificates"]["ClusterCsr"]
+    logger.debug("get_hsm_csr() returning: {}".format(hsm_csr_str))
+
+    return hsm_csr_str.encode("utf-8")
+
+
+def initialize_cluster(cluster_id, signed_cert, trust_anchor):
+    hsm_client = boto3.client('cloudhsmv2')
+    init_cluster_resp = hsm_client.initialize_cluster(ClusterId=cluster_id,
+                                                      SignedCert=signed_cert,
+                                                      TrustAnchor=trust_anchor)
+
+    # TODO perform exception handling based on the response

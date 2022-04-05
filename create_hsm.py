@@ -26,6 +26,11 @@ def create_hsm():
         hsm_services.create_hsm(cluster_details["Clusters"][0]["ClusterId"],
                                 subnet_details["azs"][0])
 
+        # Wait for HSM creation to complete - this can take up to 5 minutes.
+        logger.info("Waiting for HSM creation to complete.")
+        hsm_services.wait_for_hsm_create_complete()
+        logger.info("HSM created successfully.")
+
     except SsmParameterNotFoundError as err:
         logger.error(err)
         logger.error("Has the core infrastructure been provisioned and tagged appropriately?")

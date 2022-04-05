@@ -1,4 +1,5 @@
 # Standard/External modules
+import logging.config
 import datetime
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
@@ -8,6 +9,10 @@ from cryptography.hazmat.primitives import hashes
 
 # Custom/Internal Modules
 import automation_config as config
+from services import ssm_services, hsm_services
+
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
 
 
 def create_ca_self_signed_cert():
@@ -23,7 +28,7 @@ def create_ca_self_signed_cert():
     ])
 
     # build the certificate
-    cert = x509.CertificateBuilder().subject_name(subject) \
+    certificate = x509.CertificateBuilder().subject_name(subject) \
         .issuer_name(issuer) \
         .public_key(
         key.public_key()
@@ -37,39 +42,54 @@ def create_ca_self_signed_cert():
 
     return {
         "key": key,
-        "cert": cert
+        "certificate": certificate
     }
 
 
-def create_csr():
-    # create entity private key
-    key = rsa.generate_private_key(public_exponent=65537,
-                                   key_size=2048)
+def sign_hsm_csr(csr, ca_certificate, ca_key):
+    # build the end entity certificate
+    signed_certificate = x509.CertificateBuilder()\
+        .subject_name(csr.subject) \
+        .issuer_name(ca_certificate.issuer) \
+        .public_key(csr.public_key())\
+        .serial_number(x509.random_serial_number())\
+        .not_valid_before(datetime.datetime.utcnow())\
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=config.hsm_cert_expiry_days))\
+        .sign(ca_key, hashes.SHA256())
 
-    csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, u"GB"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"London"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, u"London"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"My Company"),
-        x509.NameAttribute(NameOID.COMMON_NAME, u"mysite.com"),
-    ])).add_extension(
-        x509.SubjectAlternativeName([
-            x509.DNSName(u"www.mysite.com"),
-            x509.DNSName(u"subdomain.mysite.com")
-        ]),
-        critical=False,
-    ).sign(key, hashes.SHA256())
+    return signed_certificate
 
-    return{
-        "key": key,
-        "csr": csr
+
+def create_hsm_pki():
+    # get the hsm csr into memory
+    logger.info("Getting HSM cluster CSR.")
+    hsm_csr_pem = hsm_services.get_hsm_csr_pem(ssm_services.get_hsm_cluster_id())
+    csr = x509.load_pem_x509_csr(hsm_csr_pem)
+
+    # create the root CA
+    logger.info("Creating Root CA.")
+    root_ca = create_ca_self_signed_cert()
+    # TODO store the CA key in Secrets Manager
+
+    # store the CA cert in SSM
+    root_cert_str = root_ca["certificate"].public_bytes(serialization.Encoding.PEM).decode("utf-8")
+    logger.info("Storing Root CA in SSM.")
+    ssm_services.put_parameter(config.hsm_ca_cert_param_name, root_cert_str, "String")
+
+    # sign the HSM CSR
+    logger.info("Signing HSM cluster CSR with generated Root CA.")
+    hsm_signed_cert = sign_hsm_csr(csr, root_ca["certificate"], root_ca["key"])
+
+    # store the HSM cert in SSM
+    signed_cert_str = hsm_signed_cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
+    logger.info("Storing signed HSM cluster certificate in SSM.")
+    ssm_services.put_parameter(config.hsm_cluster_cert_param_name, signed_cert_str, "String")
+
+    return {
+        "signed_cert": signed_cert_str,
+        "trust_anchor": root_cert_str
     }
-
-
-def test_sign_csr():
-    self_signed_resp = create_ca_self_signed_cert()
-    csr_resp = create_csr()
 
 
 if __name__ == '__main__':
-    test_sign_csr()
+    create_hsm_pki()
