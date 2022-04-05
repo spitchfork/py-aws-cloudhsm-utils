@@ -3,6 +3,7 @@ import sys
 import logging.config
 
 # Custom/Internal Modules
+from exceptions import SsmParameterNotFoundError
 from services import ec2_services
 from services import hsm_services
 from services import ssm_services
@@ -25,6 +26,10 @@ def create_hsm():
         hsm_services.create_hsm(cluster_details["Clusters"][0]["ClusterId"],
                                 subnet_details["azs"][0])
 
+    except SsmParameterNotFoundError as err:
+        logger.error(err)
+        logger.error("Has the core infrastructure been provisioned and tagged appropriately?")
+        sys.exit(1)
     except Exception as err:
         logger.error(err)
         sys.exit(1)
