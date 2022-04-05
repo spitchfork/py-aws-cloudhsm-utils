@@ -1,0 +1,51 @@
+{
+  'Clusters': [
+    {
+      'BackupPolicy': 'DEFAULT',
+      'BackupRetentionPolicy': {
+        'Type': 'DAYS',
+        'Value': '90'
+      },
+      'ClusterId': 'cluster-c5...',
+      'CreateTimestamp': 'redacted',
+      'Hsms': [
+        {
+          'AvailabilityZone': 'eu-west-2a',
+          'ClusterId': 'cluster-c5...',
+          'SubnetId': 'subnet-0f...',
+          'EniId': 'eni-0e...',
+          'EniIp': '10.0.0.37',
+          'HsmId': 'hsm-js...',
+          'State': 'ACTIVE',
+          'StateMessage': 'HSM created.'
+        }
+      ],
+      'HsmType': 'hsm1.medium',
+      'SecurityGroup': 'sg-0...',
+      'State': 'UNINITIALIZED',
+      'SubnetMapping': {
+        'eu-west-2a': 'subnet-0f...',
+        'eu-west-2b': 'subnet-06...'
+      },
+      'VpcId': 'vpc-09b...',
+      'Certificates': {
+        'ClusterCsr': '-----BEGIN CERTIFICATE REQUEST-----redacted-----END CERTIFICATE REQUEST-----',
+        'HsmCertificate': '-----BEGIN CERTIFICATE-----redacted-----END CERTIFICATE-----',
+        'AwsHardwareCertificate': '-----BEGIN CERTIFICATE-----redacted-----END CERTIFICATE-----',
+        'ManufacturerHardwareCertificate': '-----BEGIN CERTIFICATE-----redacted-----END CERTIFICATE-----'
+      },
+      'TagList': []
+    }
+  ],
+  'ResponseMetadata': {
+    'RequestId': 'a9...',
+    'HTTPStatusCode': 200,
+    'HTTPHeaders': {
+      'x-amzn-requestid': 'a9...',
+      'content-type': 'application/x-amz-json-1.1',
+      'content-length': '5805',
+      'date': 'redacted'
+    },
+    'RetryAttempts': 0
+  }
+}
