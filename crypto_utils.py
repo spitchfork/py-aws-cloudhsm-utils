@@ -27,18 +27,16 @@ def create_ca_self_signed_cert():
         x509.NameAttribute(NameOID.COMMON_NAME, config.ca_common_name)
     ])
 
-    # build the certificate
-    certificate = x509.CertificateBuilder().subject_name(subject) \
+    # build the CA certificate
+    certificate = x509.CertificateBuilder()\
+        .subject_name(subject) \
         .issuer_name(issuer) \
-        .public_key(
-        key.public_key()
-    ).serial_number(
-        x509.random_serial_number()
-    ).not_valid_before(
-        datetime.datetime.utcnow()
-    ).not_valid_after(
-        datetime.datetime.utcnow() + datetime.timedelta(days=config.ca_cert_expiry_days)
-    ).sign(key, hashes.SHA256())
+        .public_key(key.public_key())\
+        .serial_number(x509.random_serial_number())\
+        .not_valid_before(datetime.datetime.utcnow())\
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=config.ca_cert_expiry_days))\
+        .add_extension(x509.BasicConstraints(True, 0), critical=True)\
+        .sign(key, hashes.SHA256())
 
     return {
         "key": key,
