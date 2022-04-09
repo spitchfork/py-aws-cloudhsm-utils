@@ -3,6 +3,7 @@ import sys
 import logging.config
 
 # Custom/Internal Modules
+import exceptions
 from services import ec2_services
 from services import hsm_services
 from services import ssm_services
@@ -38,6 +39,10 @@ def configure_security_groups():
 
         logger.info("Ingress rule added to security group: {}".format(hsm_cluster_sg_id))
 
+    except exceptions.SecurityGroupNotFoundError as err:
+        logger.error(err)
+        logger.error("Security groups must be configured for cluster creation.")
+        sys.exit(1)
     except Exception as err:
         logger.error(err)
         sys.exit(1)

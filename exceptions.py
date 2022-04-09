@@ -20,3 +20,11 @@ class HsmClusterCreateError(Exception):
 
 class HsmCreateError(Exception):
     pass
+
+
+class HsmClustersNotFoundError(Exception):
+    pass
+
+
+class SecurityGroupNotFoundError(Exception):
+    pass

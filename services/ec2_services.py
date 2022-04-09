@@ -23,8 +23,10 @@ def get_sg_id_by_tag(tag_name, tag_value):
 def get_sg_id(boto_filter):
     ec2_client = boto3.client('ec2')
     sg = ec2_client.describe_security_groups(Filters=boto_filter)
-    # TODO throw exception if no security group can be found e.g. cfn template not run yet
-    # TODO throw exception if more than 1 security group is returned
+    # throw exception if no security group can be found e.g. cfn template not run yet
+    # or more than one exists with the given name or tag
+    if len(sg["SecurityGroups"]) != 1:
+        raise exceptions.SecurityGroupNotFoundError("No security group id found for the given filter.")
 
     logger.debug("Returning security group Id: {}".format(sg["SecurityGroups"][0]["GroupId"]))
     sg_id = sg["SecurityGroups"][0]["GroupId"]
